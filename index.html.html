@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Iron Journal">
+<meta name="theme-color" content="#0A0A0F">
+<title>Iron Journal · Yousef's PPL Program</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0A0A0F;
+    --bg-elevated: #12121C;
+    --bg-card: #16161F;
+    --bg-card-hover: #1C1C27;
+    --border: #22222E;
+    --border-light: #2D2D3A;
+    --text: #EBE7DC;
+    --text-dim: #8A8A96;
+    --text-muted: #4F4F5B;
+    --accent: #E8B45A;
+    --push: #D4463C;
+    --pull: #3B7FD4;
+    --legs: #2DA368;
+    --rest: #4A4A55;
+    --gold: #D4AF37;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-image:
+      radial-gradient(ellipse at top left, rgba(232,180,90,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(212,70,60,0.03) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    padding: 28px 22px 22px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    top: 0; right: -80px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(232,180,90,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .brand-mark {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .brand-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border-light);
+  }
+
+  .brand-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .menu-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .menu-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .title-block { margin-bottom: 16px; }
+
+  .title-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .title-main {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 34px;
+    line-height: 1.0;
+    color: var(--text);
+    letter-spacing: -1px;
+    font-style: italic;
+  }
+
+  .title-main em {
+    font-weight: 700;
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .title-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 10px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .title-meta span:not(:last-child)::after {
+    content: '·';
+    margin-left: 14px;
+    color: var(--text-muted);
+  }
+
+  /* ===== STATS BAR ===== */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    margin: 0 22px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .stat {
+    background: var(--bg-card);
+    padding: 12px 10px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ===== CALENDAR ===== */
+  .calendar-section {
+    padding: 20px 22px 10px;
+  }
+
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 8px;
+    gap: 4px;
+  }
+
+  .cal-weekday {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    text-align: center;
+    letter-spacing: 1px;
+    padding: 4px 0;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+
+  .cal-day {
+    aspect-ratio: 1;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    padding: 4px;
+  }
+
+  .cal-day:hover { border-color: var(--accent); }
+
+  .cal-day.empty {
+    background: transparent;
+    border: none;
+    cursor: default;
+  }
+
+  .cal-day.rest {
+    background: var(--bg);
+    border-color: var(--border);
+  }
+
+  .cal-day.active {
+    border-color: var(--accent);
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(232,180,90,0.1);
+  }
+
+  .cal-day.completed {
+    background: linear-gradient(135deg, var(--bg-card), rgba(45,163,104,0.15));
+    border-color: var(--legs);
+  }
+
+  .cal-date {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .cal-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+    font-weight: 700;
+  }
+
+  .cal-tag.push { color: var(--push); }
+  .cal-tag.pull { color: var(--pull); }
+  .cal-tag.legs { color: var(--legs); }
+  .cal-tag.rest { color: var(--text-muted); }
+
+  .cal-day.today::before {
+    content: '';
+    position: absolute;
+    top: 3px; right: 3px;
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  /* ===== WORKOUT SECTION ===== */
+  .workout-section {
+    padding: 20px 22px 40px;
+  }
+
+  .day-header {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .day-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--day-color, var(--accent));
+  }
+
+  .day-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .day-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: var(--day-color, var(--accent));
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .day-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 2px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .day-subtitle {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .day-date {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .day-date-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .day-date-month {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .day-focus {
+    display: inline-block;
+    background: rgba(232,180,90,0.08);
+    border: 1px solid rgba(232,180,90,0.2);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  .progress-bar {
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--day-color, var(--accent));
+    transition: width 0.4s ease;
+    width: 0;
+  }
+
+  .progress-text {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ===== EXERCISE CARD ===== */
+  .exercise {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+
+  .exercise.done {
+    opacity: 0.6;
+    background: var(--bg-elevated);
+  }
+
+  .exercise-head {
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .check-box {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border-light);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.15s;
+  }
+
+  .exercise.done .check-box {
+    background: var(--day-color, var(--accent));
+    border-color: var(--day-color, var(--accent));
+  }
+
+  .check-box svg { opacity: 0; transition: opacity 0.15s; }
+  .exercise.done .check-box svg { opacity: 1; }
+
+  .exercise-body { flex: 1; min-width: 0; }
+
+  .exercise-name {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+
+  .exercise.done .exercise-name { text-decoration: line-through; color: var(--text-dim); }
+
+  .exercise-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .badge-reps {
+    background: rgba(232,180,90,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(232,180,90,0.2);
+  }
+
+  .badge-rest {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .exercise-note {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  .exercise-toggle {
+    color: var(--text-muted);
+    font-size: 18px;
+    padding: 4px;
+    transition: transform 0.2s;
+  }
+
+  .exercise.expanded .exercise-toggle { transform: rotate(180deg); }
+
+  /* ===== WEIGHT LOG ===== */
+  .exercise-log {
+    padding: 0 16px 14px;
+    display: none;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+    padding-top: 14px;
+  }
+
+  .exercise.expanded .exercise-log { display: block; }
+
+  .log-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .set-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .set-row {
+    display: grid;
+    grid-template-columns: 30px 1fr 1fr;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .set-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .set-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .set-input:focus { border-color: var(--accent); }
+  .set-input::placeholder { color: var(--text-muted); }
+
+  .log-previous {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: var(--bg);
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .log-previous strong { color: var(--accent); }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    display: none;
+    z-index: 100;
+    padding: 20px;
+    overflow-y: auto;
+  }
+
+  .modal-overlay.active { display: flex; align-items: flex-start; justify-content: center; }
+
+  .modal {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    max-width: 500px;
+    width: 100%;
+    padding: 24px;
+    margin-top: 40px;
+  }
+
+  .modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .tip {
+    background: var(--bg-card);
+    border-left: 3px solid var(--accent);
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .tip-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .tip-body {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    padding: 30px 22px 40px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  .footer-quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .footer-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Week navigation */
+  .week-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .week-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .week-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Install prompt */
+  .install-banner {
+    background: linear-gradient(135deg, rgba(232,180,90,0.1), rgba(212,175,55,0.05));
+    border: 1px solid rgba(232,180,90,0.2);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 0 22px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .install-banner-text {
+    flex: 1;
+    font-family: 'Fraunces', serif;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  .install-banner-text strong { color: var(--accent); }
+
+  .install-banner button {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in { animation: fadeIn 0.3s ease; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-top">
+    <div class="brand">
+      <span class="brand-mark">IRON</span>
+      <span class="brand-divider"></span>
+      <span class="brand-sub">Journal / v1.0</span>
+    </div>
+    <button class="menu-btn" onclick="toggleTips()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+      </svg>
+    </button>
+  </div>
+  <div class="title-block">
+    <div class="title-label">Bismillah · Program 001</div>
+    <div class="title-main">Push. <em>Pull.</em> Legs.</div>
+    <div class="title-meta">
+      <span>6 days / week</span>
+      <span>Beginner</span>
+      <span>Hypertrophy</span>
+    </div>
+  </div>
+</header>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-value" id="stat-day">1</div>
+    <div class="stat-label">Day</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value" id="stat-week">1</div>
+    <div class="stat-label">Week</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value" id="stat-complete">0</div>
+    <div class="stat-label">Sessions</div>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <div class="install-banner-text">
+    <strong>Install as app:</strong> On iPhone tap Share → Add to Home Screen. On Android tap menu → Install app.
+  </div>
+  <button onclick="document.getElementById('installBanner').style.display='none'">✕</button>
+</div>
+
+<!-- CALENDAR -->
+<section class="calendar-section">
+  <div class="section-title">Schedule · 15 Apr — 15 May 2026</div>
+
+  <div class="week-nav" id="weekNav"></div>
+
+  <div class="cal-weekdays">
+    <div class="cal-weekday">SUN</div>
+    <div class="cal-weekday">MON</div>
+    <div class="cal-weekday">TUE</div>
+    <div class="cal-weekday">WED</div>
+    <div class="cal-weekday">THU</div>
+    <div class="cal-weekday">FRI</div>
+    <div class="cal-weekday">SAT</div>
+  </div>
+  <div class="cal-grid" id="calendar"></div>
+</section>
+
+<!-- WORKOUT -->
+<section class="workout-section" id="workout"></section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-quote">
+    "The body achieves what the mind believes."<br>
+    <span style="opacity:0.6;">Train with intention. Rest with gratitude.</span>
+  </div>
+  <div class="footer-meta">إن شاء الله · Made for Yousef</div>
+</footer>
+
+<!-- TIPS MODAL -->
+<div class="modal-overlay" id="tipsModal" onclick="if(event.target===this)toggleTips()">
+  <div class="modal">
+    <div class="modal-title">
+      Training Principles
+      <button class="modal-close" onclick="toggleTips()">✕</button>
+    </div>
+    <div class="tip">
+      <div class="tip-title">Progressive Overload</div>
+      <div class="tip-body">Add 2.5 kg to compound lifts every 1–2 weeks. For isolation moves, add reps first, then weight. This is the single biggest driver of results.</div>
+    </div>
+    <div class="tip">
+      <div class="tip-title">Round 1 vs Round 2</div>
+      <div class="tip-body">Round 1 (3 days) focuses on strength with heavier loads and lower reps. Round 2 (3 days) focuses on hypertrophy with higher reps and pump volume. Both hit each muscle once — so every muscle gets trained twice weekly.</div>
+    </div>
+    <div class="tip">
+      <div class="tip-title">Warm-Up Protocol</div>
+      <div class="tip-body">5 min cardio + 2 warm-up sets at 50% and 70% of your working weight before the first compound of each day.</div>
+    </div>
+    <div class="tip">
+      <div class="tip-title">Form Over Ego</div>
+      <div class="tip-body">As a beginner, master the movement pattern before chasing weight. Film yourself on compounds to check form.</div>
+    </div>
+    <div class="tip">
+      <div class="tip-title">Nutrition</div>
+      <div class="tip-body">1.6–2.2 g protein per kg of bodyweight daily. Eat in a slight calorie surplus (+200–300 kcal) to build muscle. Hydrate (3+ litres water).</div>
+    </div>
+    <div class="tip">
+      <div class="tip-title">Sleep is Training</div>
+      <div class="tip-body">Muscles grow during rest, not during the workout. Aim for 7–9 hours per night. Growth hormone peaks in deep sleep.</div>
+    </div>
+    <div class="tip">
+      <div class="tip-title">Deload Week</div>
+      <div class="tip-body">After 6–8 weeks of consistent training, take a deload week — reduce volume and intensity by 40–50%. You'll come back stronger.</div>
+    </div>
+    <div class="tip">
+      <div class="tip-title">Data Storage</div>
+      <div class="tip-body">All your weights and progress are saved locally in this browser. Don't clear browser data or you'll lose your log. For long-term tracking, consider a dedicated app like Hevy or Strong.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ CONFIG ============
+const START_DATE = new Date(2026, 3, 15); // April 15, 2026 (Wed)
+const END_DATE = new Date(2026, 4, 15);   // May 15, 2026
+const TODAY = new Date();
+TODAY.setHours(0,0,0,0);
+
+// 7-day cycle: Wed=Push1, Thu=Pull1, Fri=Legs1, Sat=Push2, Sun=Pull2, Mon=Legs2, Tue=Rest
+const CYCLE = [
+  { type: 'push1', color: '#D4463C' },
+  { type: 'pull1', color: '#3B7FD4' },
+  { type: 'legs1', color: '#2DA368' },
+  { type: 'push2', color: '#E8832C' },
+  { type: 'pull2', color: '#8B5CF6' },
+  { type: 'legs2', color: '#14B8A6' },
+  { type: 'rest',  color: '#4A4A55' },
+];
+
+const WORKOUTS = {
+  push1: {
+    name: 'PUSH · ROUND I',
+    subtitle: 'Chest, shoulders & triceps',
+    focus: 'Strength — heavy compounds',
+    color: '#D4463C',
+    exercises: [
+      { name: 'Barbell Bench Press',           sets: 4, reps: '6–8',   rest: '3 min', note: 'Main chest compound. Film your form.' },
+      { name: 'Seated Dumbbell Shoulder Press', sets: 4, reps: '8–10',  rest: '2 min', note: 'Strict form. No leg drive.' },
+      { name: 'Incline Dumbbell Press',         sets: 3, reps: '8–10',  rest: '90 s',  note: '30° bench — upper chest focus.' },
+      { name: 'Dumbbell Lateral Raises',        sets: 3, reps: '12–15', rest: '60 s',  note: 'Controlled. Slight forward lean.' },
+      { name: 'Tricep Rope Pushdown',           sets: 3, reps: '10–12', rest: '60 s',  note: 'Spread the rope at bottom.' },
+      { name: 'Overhead Tricep Extension',      sets: 3, reps: '10–12', rest: '60 s',  note: 'Cable or dumbbell.' },
+    ]
+  },
+  pull1: {
+    name: 'PULL · ROUND I',
+    subtitle: 'Back, biceps & rear delts',
+    focus: 'Strength — heavy compounds',
+    color: '#3B7FD4',
+    exercises: [
+      { name: 'Barbell Bent-Over Row',        sets: 4, reps: '6–8',   rest: '3 min', note: 'Overhand grip, pull to navel.' },
+      { name: 'Lat Pulldown (Wide Grip)',     sets: 4, reps: '8–10',  rest: '2 min', note: 'Full stretch at top.' },
+      { name: 'Seated Cable Row',             sets: 3, reps: '10–12', rest: '90 s',  note: 'Squeeze shoulder blades.' },
+      { name: 'Face Pulls',                    sets: 3, reps: '15–20', rest: '60 s',  note: 'Rear delts & shoulder health.' },
+      { name: 'Barbell Curl (EZ Bar)',        sets: 3, reps: '10–12', rest: '60 s',  note: 'No swinging. Strict.' },
+      { name: 'Hammer Curls',                 sets: 3, reps: '12–15', rest: '60 s',  note: 'Brachialis & forearms.' },
+    ]
+  },
+  legs1: {
+    name: 'LEGS · ROUND I',
+    subtitle: 'Quads, hamstrings & calves',
+    focus: 'Strength — heavy compounds',
+    color: '#2DA368',
+    exercises: [
+      { name: 'Barbell Back Squat',           sets: 4, reps: '6–8',   rest: '3 min', note: 'King of all lifts. Depth matters.' },
+      { name: 'Romanian Deadlift (RDL)',      sets: 4, reps: '8–10',  rest: '2 min', note: 'Hamstring stretch. Neutral spine.' },
+      { name: 'Leg Press',                     sets: 3, reps: '10–12', rest: '2 min', note: 'Feet shoulder-width.' },
+      { name: 'Walking Lunges',                sets: 3, reps: '10/leg',rest: '90 s',  note: 'Dumbbells in hand.' },
+      { name: 'Leg Curl Machine',              sets: 3, reps: '12–15', rest: '60 s',  note: 'Slow eccentric (3 s down).' },
+      { name: 'Standing Calf Raises',          sets: 4, reps: '12–15', rest: '60 s',  note: 'Full range of motion.' },
+    ]
+  },
+  push2: {
+    name: 'PUSH · ROUND II',
+    subtitle: 'Chest, shoulders & triceps',
+    focus: 'Hypertrophy — higher volume',
+    color: '#E8832C',
+    exercises: [
+      { name: 'Incline Barbell Press',        sets: 4, reps: '10–12', rest: '2 min', note: 'Upper chest emphasis.' },
+      { name: 'Flat Dumbbell Flyes',          sets: 3, reps: '12–15', rest: '60 s',  note: 'Deep stretch, squeeze at top.' },
+      { name: 'Machine Chest Press',          sets: 3, reps: '12–15', rest: '60 s',  note: 'Focus on contraction.' },
+      { name: 'Arnold Press',                 sets: 3, reps: '12–15', rest: '60 s',  note: 'Rotational shoulder press.' },
+      { name: 'Cable Lateral Raises',         sets: 3, reps: '15–20', rest: '45 s',  note: 'One arm at a time.' },
+      { name: 'Dips (Machine or Bodyweight)', sets: 3, reps: '10–15', rest: '90 s',  note: 'Lean forward for chest.' },
+      { name: 'Skull Crushers',               sets: 3, reps: '12–15', rest: '60 s',  note: 'EZ bar or dumbbells.' },
+    ]
+  },
+  pull2: {
+    name: 'PULL · ROUND II',
+    subtitle: 'Back, biceps & rear delts',
+    focus: 'Hypertrophy — higher volume',
+    color: '#8B5CF6',
+    exercises: [
+      { name: 'Pull-Ups (or Assisted)',       sets: 4, reps: '8–12',  rest: '2 min', note: 'Use assist band if needed.' },
+      { name: 'Single-Arm Dumbbell Row',      sets: 3, reps: '10–12/arm',rest: '90 s', note: 'Knee on bench.' },
+      { name: 'Cable Pullover',               sets: 3, reps: '12–15', rest: '60 s',  note: 'Lat isolation.' },
+      { name: 'Reverse Pec Deck',             sets: 3, reps: '15–20', rest: '60 s',  note: 'Rear delt focus.' },
+      { name: 'Chest-Supported Row',          sets: 3, reps: '12–15', rest: '60 s',  note: 'Incline bench + dumbbells.' },
+      { name: 'Incline Dumbbell Curl',        sets: 3, reps: '12–15', rest: '60 s',  note: 'Long head stretch.' },
+      { name: 'Cable Rope Curl',              sets: 2, reps: '15–20', rest: '45 s',  note: 'Burnout finisher.' },
+    ]
+  },
+  legs2: {
+    name: 'LEGS · ROUND II',
+    subtitle: 'Glutes, quads & calves',
+    focus: 'Hypertrophy — higher volume',
+    color: '#14B8A6',
+    exercises: [
+      { name: 'Front Squat or Goblet Squat',  sets: 4, reps: '10–12', rest: '2 min', note: 'Quad-dominant pattern.' },
+      { name: 'Barbell Hip Thrust',           sets: 4, reps: '10–12', rest: '2 min', note: 'Squeeze glutes at top.' },
+      { name: 'Bulgarian Split Squat',        sets: 3, reps: '12/leg',rest: '90 s',  note: 'Dumbbells in hand.' },
+      { name: 'Leg Extension',                sets: 3, reps: '15–20', rest: '60 s',  note: 'Pause 1 s at top.' },
+      { name: 'Seated Leg Curl',              sets: 3, reps: '12–15', rest: '60 s',  note: 'Slow 3-s eccentric.' },
+      { name: 'Seated Calf Raises',           sets: 4, reps: '15–20', rest: '60 s',  note: 'Targets soleus muscle.' },
+      { name: 'Hanging Leg Raises',           sets: 3, reps: '12–15', rest: '60 s',  note: 'Core finisher.' },
+    ]
+  },
+  rest: {
+    name: 'REST DAY',
+    subtitle: 'Active recovery & nutrition',
+    focus: 'Recovery',
+    color: '#4A4A55',
+    exercises: []
+  }
+};
+
+// ============ STATE ============
+const STORAGE_KEY = 'iron-journal-v1';
+let state = loadState();
+let currentDate = null;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : { logs: {}, completed: {} };
+  } catch { return { logs: {}, completed: {} }; }
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+}
+
+// ============ HELPERS ============
+function formatDate(d) {
+  return d.toISOString().split('T')[0];
+}
+
+function monthName(d) {
+  return d.toLocaleString('en', { month: 'short' }).toUpperCase();
+}
+
+function dayName(d) {
+  return d.toLocaleString('en', { weekday: 'short' }).toUpperCase();
+}
+
+function getWorkoutForDate(d) {
+  const diff = Math.floor((d - START_DATE) / (1000*60*60*24));
+  if (diff < 0) return null;
+  const idx = diff % 7;
+  return CYCLE[idx];
+}
+
+function getDayNumber(d) {
+  return Math.floor((d - START_DATE) / (1000*60*60*24)) + 1;
+}
+
+function getWeekNumber(d) {
+  return Math.floor((d - START_DATE) / (1000*60*60*24*7)) + 1;
+}
+
+// ============ CALENDAR RENDER ============
+function renderCalendar() {
+  const cal = document.getElementById('calendar');
+  cal.innerHTML = '';
+
+  // Start from Sunday before START_DATE
+  const first = new Date(START_DATE);
+  const dayOfWeek = first.getDay(); // 0=Sun, 3=Wed
+  first.setDate(first.getDate() - dayOfWeek);
+
+  const totalDays = 35; // 5 weeks
+
+  for (let i = 0; i < totalDays; i++) {
+    const d = new Date(first);
+    d.setDate(first.getDate() + i);
+    const cell = document.createElement('div');
+
+    if (d < START_DATE || d > END_DATE) {
+      cell.className = 'cal-day empty';
+      cal.appendChild(cell);
+      continue;
+    }
+
+    const w = getWorkoutForDate(d);
+    const type = w ? w.type : 'rest';
+    const tag = type === 'rest' ? 'REST' :
+                type.startsWith('push') ? 'PUSH' :
+                type.startsWith('pull') ? 'PULL' : 'LEGS';
+    const tagClass = type === 'rest' ? 'rest' :
+                     type.startsWith('push') ? 'push' :
+                     type.startsWith('pull') ? 'pull' : 'legs';
+
+    cell.className = 'cal-day' + (type === 'rest' ? ' rest' : '');
+    if (state.completed[formatDate(d)]) cell.classList.add('completed');
+    if (currentDate && formatDate(d) === formatDate(currentDate)) cell.classList.add('active');
+    if (formatDate(d) === formatDate(TODAY)) cell.classList.add('today');
+
+    cell.innerHTML = `
+      <div class="cal-date">${d.getDate()}</div>
+      <div class="cal-tag ${tagClass}">${tag}</div>
+    `;
+    cell.onclick = () => selectDate(d);
+    cal.appendChild(cell);
+  }
+}
+
+// ============ WEEK NAV ============
+function renderWeekNav() {
+  const nav = document.getElementById('weekNav');
+  nav.innerHTML = '';
+  const totalDays = Math.ceil((END_DATE - START_DATE) / (1000*60*60*24)) + 1;
+  const weeks = Math.ceil(totalDays / 7);
+
+  for (let i = 0; i < weeks; i++) {
+    const weekStart = new Date(START_DATE);
+    weekStart.setDate(weekStart.getDate() + i * 7);
+    const btn = document.createElement('button');
+    btn.className = 'week-btn';
+    if (currentDate && getWeekNumber(currentDate) === i + 1) btn.classList.add('active');
+    btn.textContent = `WK ${i + 1} · ${weekStart.getDate()} ${monthName(weekStart)}`;
+    btn.onclick = () => {
+      // Jump to first trained day of that week
+      const jump = new Date(weekStart);
+      selectDate(jump);
+    };
+    nav.appendChild(btn);
+  }
+}
+
+// ============ WORKOUT RENDER ============
+function selectDate(d) {
+  currentDate = new Date(d);
+  currentDate.setHours(0,0,0,0);
+  renderCalendar();
+  renderWeekNav();
+  renderWorkout();
+  updateStats();
+  // Scroll to workout
+  setTimeout(() => {
+    document.getElementById('workout').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function renderWorkout() {
+  const container = document.getElementById('workout');
+  if (!currentDate) { container.innerHTML = ''; return; }
+
+  const w = getWorkoutForDate(currentDate);
+  if (!w) { container.innerHTML = ''; return; }
+
+  const workout = WORKOUTS[w.type];
+  const dateKey = formatDate(currentDate);
+  const logs = state.logs[dateKey] || {};
+  const dayNum = getDayNumber(currentDate);
+  const weekNum = getWeekNumber(currentDate);
+
+  const totalEx = workout.exercises.length;
+  const doneCount = workout.exercises.filter((_, i) => logs[`ex-${i}-done`]).length;
+  const pct = totalEx > 0 ? (doneCount / totalEx) * 100 : 0;
+
+  let html = `
+    <div class="day-header fade-in" style="--day-color: ${w.color}">
+      <div class="day-header-top">
+        <div>
+          <div class="day-label">Day ${dayNum} · Week ${weekNum}</div>
+          <div class="day-title">${workout.name}</div>
+          <div class="day-subtitle">${workout.subtitle}</div>
+          <div class="day-focus">${workout.focus}</div>
+        </div>
+        <div class="day-date">
+          <div class="day-date-num">${currentDate.getDate()}</div>
+          <div class="day-date-month">${monthName(currentDate)}</div>
+          <div class="day-date-month" style="margin-top:4px;">${dayName(currentDate)}</div>
+        </div>
+      </div>
+      ${totalEx > 0 ? `
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="progress-text">
+          <span>${doneCount} / ${totalEx} complete</span>
+          <span>${Math.round(pct)}%</span>
+        </div>
+      ` : ''}
+    </div>
+  `;
+
+  if (w.type === 'rest') {
+    html += `
+      <div class="exercise">
+        <div class="exercise-head" style="cursor:default;">
+          <div style="width:22px;height:22px;border-radius:50%;background:${w.color};flex-shrink:0;margin-top:2px;"></div>
+          <div class="exercise-body">
+            <div class="exercise-name">Recovery Day</div>
+            <div class="exercise-note">Light walking, stretching, and mobility work recommended. Prioritize sleep (7–9 h), hydration (3+ L water), and protein intake. Your muscles grow today — not in the gym. جزاك الله خيراً for the rest.</div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    workout.exercises.forEach((ex, i) => {
+      const isDone = logs[`ex-${i}-done`];
+      const setsData = logs[`ex-${i}-sets`] || {};
+      const prevKey = findPreviousLog(dateKey, w.type, i);
+
+      let setRowsHTML = '';
+      for (let s = 0; s < ex.sets; s++) {
+        setRowsHTML += `
+          <div class="set-row">
+            <div class="set-num">${s + 1}</div>
+            <input type="number" class="set-input" placeholder="weight (kg)" value="${setsData[`s${s}-w`] || ''}"
+                   oninput="updateSet('${dateKey}', ${i}, ${s}, 'w', this.value)"
+                   onclick="event.stopPropagation()">
+            <input type="number" class="set-input" placeholder="reps" value="${setsData[`s${s}-r`] || ''}"
+                   oninput="updateSet('${dateKey}', ${i}, ${s}, 'r', this.value)"
+                   onclick="event.stopPropagation()">
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="exercise ${isDone ? 'done' : ''}" data-ex="${i}">
+          <div class="exercise-head" onclick="toggleExpand(${i})">
+            <div class="check-box" onclick="event.stopPropagation(); toggleDone('${dateKey}', ${i})">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div class="exercise-body">
+              <div class="exercise-name">${ex.name}</div>
+              <div class="exercise-meta">
+                <span class="badge badge-reps">${ex.sets} × ${ex.reps}</span>
+                <span class="badge badge-rest">rest ${ex.rest}</span>
+              </div>
+              <div class="exercise-note">${ex.note}</div>
+            </div>
+            <div class="exercise-toggle">⌄</div>
+          </div>
+          <div class="exercise-log">
+            <div class="log-title">Log · ${ex.sets} working sets</div>
+            <div class="set-rows">${setRowsHTML}</div>
+            ${prevKey ? `<div class="log-previous"><span>Last session:</span><strong>${prevKey}</strong></div>` : ''}
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  container.innerHTML = html;
+}
+
+// ============ ACTIONS ============
+function toggleDone(dateKey, exIdx) {
+  if (!state.logs[dateKey]) state.logs[dateKey] = {};
+  const key = `ex-${exIdx}-done`;
+  state.logs[dateKey][key] = !state.logs[dateKey][key];
+
+  // Check if all done
+  const w = getWorkoutForDate(currentDate);
+  const workout = WORKOUTS[w.type];
+  const allDone = workout.exercises.every((_, i) => state.logs[dateKey][`ex-${i}-done`]);
+  state.completed[dateKey] = allDone;
+
+  saveState();
+  renderWorkout();
+  renderCalendar();
+  updateStats();
+}
+
+function toggleExpand(idx) {
+  const el = document.querySelector(`.exercise[data-ex="${idx}"]`);
+  if (el) el.classList.toggle('expanded');
+}
+
+function updateSet(dateKey, exIdx, setIdx, field, value) {
+  if (!state.logs[dateKey]) state.logs[dateKey] = {};
+  const setsKey = `ex-${exIdx}-sets`;
+  if (!state.logs[dateKey][setsKey]) state.logs[dateKey][setsKey] = {};
+  state.logs[dateKey][setsKey][`s${setIdx}-${field}`] = value;
+  saveState();
+}
+
+function findPreviousLog(currentDateKey, workoutType, exIdx) {
+  // Find the most recent log of the same workout type
+  const dates = Object.keys(state.logs).sort().reverse();
+  for (const d of dates) {
+    if (d >= currentDateKey) continue;
+    const dateObj = new Date(d);
+    const w = getWorkoutForDate(dateObj);
+    if (w && w.type === workoutType) {
+      const sets = state.logs[d][`ex-${exIdx}-sets`];
+      if (sets) {
+        const parts = [];
+        const workout = WORKOUTS[workoutType];
+        if (!workout) return null;
+        const ex = workout.exercises[exIdx];
+        for (let s = 0; s < ex.sets; s++) {
+          const w_v = sets[`s${s}-w`];
+          const r_v = sets[`s${s}-r`];
+          if (w_v || r_v) parts.push(`${w_v || '—'}×${r_v || '—'}`);
+        }
+        if (parts.length) return parts.join(' · ');
+      }
+    }
+  }
+  return null;
+}
+
+function updateStats() {
+  const dayEl = document.getElementById('stat-day');
+  const weekEl = document.getElementById('stat-week');
+  const completeEl = document.getElementById('stat-complete');
+
+  if (currentDate) {
+    dayEl.textContent = getDayNumber(currentDate);
+    weekEl.textContent = getWeekNumber(currentDate);
+  }
+  completeEl.textContent = Object.values(state.completed).filter(Boolean).length;
+}
+
+function toggleTips() {
+  document.getElementById('tipsModal').classList.toggle('active');
+}
+
+// ============ INIT ============
+function init() {
+  // Start on today if in range, otherwise start date
+  let start = TODAY >= START_DATE && TODAY <= END_DATE ? TODAY : START_DATE;
+  currentDate = new Date(start);
+  renderCalendar();
+  renderWeekNav();
+  renderWorkout();
+  updateStats();
+}
+
+init();
+</script>
+</body>
+</html>
